@@ -89,12 +89,10 @@ def playerStandings():
     DB = connect()
     c = DB.cursor()
     query = """ 
-    SELECT P.id, P.name, count(R.winner) as wins, temp.matches 
-    FROM Players P LEFT JOIN Records R ON P.id = R.winner, 
-         (SELECT P2.id, count(R2.m_id) as matches 
-          FROM Players P2 LEFT JOIN Records R2 ON P2.id = R2.winner OR P2.id = R2.loser GROUP BY P2.id) as temp
-    WHERE P.id = temp.id 
-    GROUP BY P.id, temp.matches 
+    SELECT P.id, P.name, count(R.winner) as wins, Num_Matches.matches 
+    FROM Players P LEFT JOIN Records R ON P.id = R.winner, Num_Matches
+    WHERE P.id = Num_Matches.id 
+    GROUP BY P.id, Num_Matches.matches 
     ORDER BY wins desc
     """
     c.execute(query)
