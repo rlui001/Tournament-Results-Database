@@ -6,13 +6,12 @@ CREATE TABLE Players (	id serial,
 						name text,
 						primary key(id));
 
-CREATE TABLE Records (	id1 integer,
-						id2 integer,
+CREATE TABLE Records (	m_id serial,
 						winner integer,
 						loser integer,
-						primary key(id1, id2),
-						foreign key (id1) references Players(id),
-						foreign key (id2) references Players(id));
+						primary key(m_id),
+						foreign key (winner) references Players(id),
+						foreign key (loser) references Players(id));
 
 --
 -- You can write comments in this file by starting them with two dashes, like
