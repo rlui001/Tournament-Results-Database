@@ -16,7 +16,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     DB = connect()
     c = DB.cursor()
-    query = "DELETE FROM Records"
+    query = "TRUNCATE TABLE Match CASCADE" # removes data, keeps table
     c.execute(query)
     DB.commit()
     DB.close()
@@ -26,7 +26,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     DB = connect()
     c = DB.cursor()
-    query = "DELETE FROM Players"
+    query = "TRUNCATE TABLE Players CASCADE"
     c.execute(query)
     DB.commit()
     DB.close()
@@ -39,7 +39,6 @@ def countPlayers():
     query = "SELECT COUNT(*) FROM Players P"
     c.execute(query)
     num = c.fetchone()[0]
-    print num
     DB.close()
     return num
 
@@ -89,8 +88,8 @@ def playerStandings():
     DB = connect()
     c = DB.cursor()
     query = """ 
-    SELECT P.id, P.name, count(R.winner) as wins, Num_Matches.matches 
-    FROM Players P LEFT JOIN Records R ON P.id = R.winner, Num_Matches
+    SELECT P.id, P.name, count(M.winner) as wins, Num_Matches.matches 
+    FROM Players P LEFT JOIN Match M ON P.id = M.winner, Num_Matches
     WHERE P.id = Num_Matches.id 
     GROUP BY P.id, Num_Matches.matches 
     ORDER BY wins desc
@@ -109,7 +108,7 @@ def reportMatch(winner, loser):
     """
     DB = connect()
     c = DB.cursor()
-    query = "INSERT INTO Records (winner, loser) values (%s, %s)"
+    query = "INSERT INTO Match (winner, loser) values (%s, %s)"
     # Parameters are int, don't need to bleach
     c.execute(query,(winner,loser,))
     DB.commit()
@@ -138,7 +137,6 @@ def swissPairings():
     # Use player standings table (ordered starting by most wins)
     # Format: [(id, name, wins, matches), ...]
     pairingList = playerStandings()
-    print pairingList[0][0]
     # Pair up first with second, third with fourth, etc... 
     # Using simple loop.. ie
     # while i != length of list
@@ -153,7 +151,6 @@ def swissPairings():
         id2 = pairingList[i][0]
         name2 = pairingList[i][1]
         i = i + 1
-        print i
         swissResults.append((id1, name1, id2, name2))
 
     return swissResults
